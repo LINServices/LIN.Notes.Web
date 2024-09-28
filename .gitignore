@@ -402,3 +402,4 @@ FodyWeavers.xsd
 *.sln.iml
 /LIN.Calendar/LIN.Calendar/wwwroot/css/Tailwind.css
 /LIN.Calendar.App/wwwroot/css/tailwind.css
+/LIN.Notes.Web/LIN.Notes.Web/wwwroot/css/tailwind.build.css
