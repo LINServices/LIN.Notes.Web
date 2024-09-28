@@ -1,0 +1,50 @@
+﻿@page "/note"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+
+@* Pantalla *@
+<div class="UIScroll @GetClass() flex h-screen w-full justify-center transition-colors duration-200 ease-in-out">
+
+    <div class="fade-in-fwd px-4 pt-9 flex h-full w-full flex-grow flex-col lg:px-10">
+
+        @* Botón de atrás *@
+        <div class="mb-3 gap-2 flex w-full">
+
+            <button @onclick="Back" type="button" class="bg-white/40 h-12 w-12 p-2 text-gray-700 flex items-center justify-center rounded-full text-sm transition-colors duration-200 hover:bg-white/60 dark:bg-zinc-500/30 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-zinc/50">
+                <svg class="h-6 w-6 rtl:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
+                </svg>
+            </button>
+
+            <button @onclick="()=>DeletePop.Show()" type="button" class="bg-white/40 flex h-12 w-12 items-center justify-center rounded-full p-2 text-sm text-gray-700 transition-colors duration-200 hover:bg-white/60 dark:bg-zinc-500/30 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-zinc/50">
+             
+                <svg class="h-4 w-4 dark:fill-gray-200" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" /></svg>
+
+            </button>
+
+        </div>
+
+
+        @* Titulo *@
+        <input @oninput="InputTittle" @bind="Tittle" class="bg-transparent text-zinc-800 placeholder-zinc-800 text-7xl font-medium outline-none dark:text-zinc-300 dark:placeholder-zinc-300" placeholder="Sin Titulo" />
+
+        @* Botones de colores. *@
+        <div class="gap-2 flex">
+
+            <button @onclick="()=>SetNewColor(0)" class="bg-yell/50 h-8 w-8 rounded-full @(NoteDataModel?.Color == 0 ? "border-2 border-black dark:border-zinc-200":"") dark:bg-yell/40"></button>
+            <button @onclick="()=>SetNewColor(1)" class="bg-salmon/50 h-8 w-8 rounded-full @(NoteDataModel?.Color == 1 ? "border-2 border-black dark:border-zinc-200":"") dark:bg-salmon/40"></button>
+            <button @onclick="()=>SetNewColor(2)" class="bg-glass/50 h-8 w-8 rounded-full @(NoteDataModel?.Color == 2 ? "border-2 border-black dark:border-zinc-200":"") dark:bg-glass/40"></button>
+            <button @onclick="()=>SetNewColor(3)" class="bg-cream-green/50 h-8 w-8 rounded-full @(NoteDataModel?.Color == 3 ? "border-2 border-black dark:border-zinc-200":"") dark:bg-cream-green/40"></button>
+            <button @onclick="()=>SetNewColor(4)" class="bg-cream-purple/50 h-8 w-8 rounded-full @(NoteDataModel?.Color == 4 ? "border-2 border-black dark:border-zinc-200":"") dark:bg-cream-purple/40"></button>
+
+        </div>
+
+        @* Contenido *@
+        <textarea @oninput="Input" @bind="Content" id="comment" rows="4" class="UIScroll mt-3 bg-transparent px-0 text-gray-900 placeholder-zinc-800 h-full w-full resize-none border-0 text-base outline-none focus:ring-0 dark:text-white dark:placeholder-gray-400 @(NoteDataModel?.Color == 1 ? "selection:bg-salmon dark:selection:bg-salmon/50" : NoteDataModel?.Color == 2 ? "selection:bg-glass dark:selection:bg-glass/50" : NoteDataModel?.Color == 3 ? "selection:bg-cream-green dark:selection:bg-cream-green/20" : NoteDataModel?.Color == 4 ? "selection:bg-cream-purple dark:selection:bg-cream-purple/50":"selection:bg-yell dark:selection:bg-yell/50" )" placeholder="Escribir tu nota..." required />
+
+    </div>
+
+</div>
+
+<LIN.Notes.Web.Client.Elements.DeletePopup @ref="DeletePop" Content="¿Eliminar esta nota?" OnAccept="Delete" />
