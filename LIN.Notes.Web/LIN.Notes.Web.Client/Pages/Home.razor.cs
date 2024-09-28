@@ -1,9 +1,7 @@
-﻿
-using LIN.Access.Notes;
+﻿using LIN.Access.Notes;
 using LIN.Types.Notes.Models;
 
 namespace LIN.Notes.Web.Client.Pages;
-
 
 public partial class Home : IDisposable
 {

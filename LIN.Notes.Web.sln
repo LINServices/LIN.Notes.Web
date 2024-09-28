@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIN.Notes.Web", "LIN.Notes.Web\LIN.Notes.Web\LIN.Notes.Web.csproj", "{B11B96A9-AEC4-48D2-9DCB-2E10E547C242}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Notes.Web", "LIN.Notes.Web\LIN.Notes.Web\LIN.Notes.Web.csproj", "{B11B96A9-AEC4-48D2-9DCB-2E10E547C242}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIN.Notes.Web.Client", "LIN.Notes.Web\LIN.Notes.Web.Client\LIN.Notes.Web.Client.csproj", "{354BDE0D-059F-4F77-B03C-2E6EA06517B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Notes.Web.Client", "LIN.Notes.Web\LIN.Notes.Web.Client\LIN.Notes.Web.Client.csproj", "{354BDE0D-059F-4F77-B03C-2E6EA06517B2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Types", "D:\LIN Services\Tipos\LIN.Types\LIN.Types.csproj", "{17C7942D-F7CD-4D14-9E17-658E790588E4}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Access.Auth", "D:\LIN Services\AccesoAPI\LIN.Access.Auth\LIN.Access.Auth.csproj", "{12CDAB4B-7F5D-496C-9855-7AC6FFEE3FD4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Types.Emma", "D:\LIN Services\Tipos\LIN.Types.Emma\LIN.Types.Emma.csproj", "{719D49EB-43E8-44C8-80FD-381F6DFAF63E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIN.Notes.Shared", "..\..\Components\LIN.Notes.Shared\LIN.Notes.Shared.csproj", "{B292F7EE-6226-4360-9BB3-23A1530F1108}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{719D49EB-43E8-44C8-80FD-381F6DFAF63E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{719D49EB-43E8-44C8-80FD-381F6DFAF63E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{719D49EB-43E8-44C8-80FD-381F6DFAF63E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B292F7EE-6226-4360-9BB3-23A1530F1108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B292F7EE-6226-4360-9BB3-23A1530F1108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B292F7EE-6226-4360-9BB3-23A1530F1108}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B292F7EE-6226-4360-9BB3-23A1530F1108}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,10 +1,8 @@
-﻿
-using LIN.Access.Auth.Hubs;
+﻿using LIN.Access.Auth.Hubs;
 using LIN.Types.Cloud.Identity.Models;
 using LIN.Types.Cloud.Identity.Enumerations;
 
 namespace LIN.Notes.Web.Client.Pages;
-
 
 public partial class Login
 {

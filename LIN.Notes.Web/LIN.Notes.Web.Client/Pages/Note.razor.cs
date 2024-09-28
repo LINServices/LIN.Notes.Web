@@ -1,13 +1,11 @@
 ﻿using LIN.Access.Notes;
-using LIN.Notes.Web.Client.Elements;
+using LIN.Notes.Shared.Modals;
 using LIN.Types.Notes.Models;
 
 namespace LIN.Notes.Web.Client.Pages;
 
-
 public partial class Note
 {
-
 
     /// <summary>
     /// Id de la nota.
@@ -17,12 +15,10 @@ public partial class Note
     public int Id { get; set; }
 
 
-
     /// <summary>
     /// Modelo de la nota.
     /// </summary>
     private NoteDataModel? NoteDataModel { get; set; }
-
 
 
     /// <summary>
@@ -31,18 +27,16 @@ public partial class Note
     private string Tittle { get; set; } = string.Empty;
 
 
-
     /// <summary>
     /// Contenido.
     /// </summary>
     private string Content { get; set; } = string.Empty;
 
 
-
-
-    DeletePopup DeletePop { get; set; }
-
-
+    /// <summary>
+    /// Modal de eliminar.
+    /// </summary>
+    private DeleteModal? DeleteModal { get; set; }
 
 
     /// <summary>
@@ -65,22 +59,19 @@ public partial class Note
     }
 
 
-
     /// <summary>
     /// Volver a atrás.
     /// </summary>
-    void Back() => JS.InvokeVoidAsync("BackLast");
-
-
+    private async void Back() => await JSRuntime.InvokeVoidAsync("backLast");
+    
 
     /// <summary>
     /// Establecer el nuevo color.
     /// </summary>
-    void SetColor()
+    private void SetColor()
     {
         GetClass();
     }
-
 
 
     /// <summary>
@@ -98,6 +89,8 @@ public partial class Note
                 return "bg-cream-green/50 dark:bg-cream-green/20";
             case 4:
                 return "bg-cream-purple/50 dark:bg-cream-purple/20";
+            default:
+                break;
         }
 
         return "bg-yell/50 dark:bg-yell/20";
@@ -105,11 +98,10 @@ public partial class Note
     }
 
 
-
     /// <summary>
     /// Input.
     /// </summary>
-    async void Input(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    private async void Input(Microsoft.AspNetCore.Components.ChangeEventArgs e)
     {
 
 
@@ -169,19 +161,19 @@ public partial class Note
         // Respuesta.
         CreateResponse response;
 
-      
-            // Solicitud a la API.
-            response = await Access.Notes.Controllers.Notes.Create(new Types.Notes.Models.NoteDataModel()
-            {
-                Color = model.Color,
-                Content = model.Content,
-                Tittle = model.Tittle
-            },
-            Session.Instance.Token);
 
-            // Respuesta.
-            return response.Response == Responses.Success ? response.LastID : 0;
-    
+        // Solicitud a la API.
+        response = await Access.Notes.Controllers.Notes.Create(new Types.Notes.Models.NoteDataModel()
+        {
+            Color = model.Color,
+            Content = model.Content,
+            Tittle = model.Tittle
+        },
+        Session.Instance.Token);
+
+        // Respuesta.
+        return response.Response == Responses.Success ? response.LastID : 0;
+
 
     }
 
@@ -258,7 +250,7 @@ public partial class Note
 
         // Respuesta de la API.
         if (NoteDataModel.Id > 0)
-            response = await Access.Notes.Controllers.Notes.Update(NoteDataModel, Session.Instance.Token);
+            _ = await Access.Notes.Controllers.Notes.Update(NoteDataModel, Session.Instance.Token);
 
         // Crear local.
         else if (NoteDataModel.Id == 0)
@@ -272,7 +264,7 @@ public partial class Note
 
             // Esta confirmado
             bool isConfirmed = !(isCreated <= 0);
-            
+
 
             // Si esta confirmado.
             if (isConfirmed)

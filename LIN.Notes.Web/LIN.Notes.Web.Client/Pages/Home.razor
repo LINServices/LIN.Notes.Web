@@ -2,7 +2,6 @@
 <PageTitle>Inicio</PageTitle>
 @inject NavigationManager NavigationManager
 
-
 @* Pantalla *@
 <div class="UIScroll fade-in flex w-full justify-center overflow-y-auto overflow-x-hidden">
     <div class="flex h-full w-full flex-grow flex-col px-4 pt-9 lg:px-10">
@@ -20,7 +19,7 @@
             <div class="bg-yellow-400/30 flex w-max items-center gap-1 rounded-full pr-4 dark:bg-yellow-500/20">
 
                 @* Perfil. *@
-               <LIN.Notes.Web.Client.Elements.PopSession OnClick="CloseSession" />
+               <PopSession OnClick="CloseSession" />
                 
                 <label class="font-medium text-zinc-900 dark:text-zinc-300">@LIN.Access.Notes.Session.Instance.Account.Name</label>
             </div>
@@ -50,7 +49,6 @@
             </div>
         }
 
-
         @* Botones de filtros. *@
         <div class="mt-5 flex w-full items-center gap-3">
 
@@ -67,15 +65,14 @@
 
         </div>
 
-
         @* Renderizar las notas. *@
-        <div class="grid-cols-2 mt-5 grid gap-3 pb-5 md:grid-cols-4">
+        <div class="grid-cols-2 mt-5 grid gap-3 pb-5 md:grid-cols-4 dl:grid-cols-5">
 
             @* Pantalla de carga. *@
             @if (Notes == null)
             {
                 <div class="col-span-2 flex w-full justify-center p-4 md:col-span-4">
-                    <LIN.Notes.Web.Client.Elements.Loader />
+                    <Loader />
                 </div>
             }
             else
@@ -90,13 +87,11 @@
                 @* Renderizar notas. *@
                 else
                 {
-
                     @* Control de notas. *@
                     @foreach(var e in Notes.Models.Where(t=>t.Color == Color || Color == -1))
                     {
-                        <LIN.Notes.Web.Client.Shared.NoteControl Note="e" OnClick="Go" />
-                    }
-                    
+                        <NoteControl Note="e" OnClick="Go" />
+                    } 
                 }
 
             }
@@ -107,6 +102,5 @@
 
 </div>
 
-
 @* Navegación inferior. *@
-<LIN.Notes.Web.Client.Elements.BottomNavigation OnClick="Create" />
+<BottomNavigation OnClick="Create" />
