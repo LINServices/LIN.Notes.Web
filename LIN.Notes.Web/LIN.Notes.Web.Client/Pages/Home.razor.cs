@@ -1,15 +1,12 @@
-﻿using LIN.Access.Notes;
-using LIN.Types.Notes.Models;
-
-namespace LIN.Notes.Web.Client.Pages;
+﻿namespace LIN.Notes.Web.Client.Pages;
 
 public partial class Home : IDisposable
 {
 
-    public static Home Instance { get; private set; }
-
-
-    int Color = -1;
+    /// <summary>
+    /// Instancia.
+    /// </summary>
+    public static Home? Instance { get; private set; }
 
 
     /// <summary>
@@ -18,17 +15,24 @@ public partial class Home : IDisposable
     public static ReadAllResponse<NoteDataModel>? Notes { get; set; }
 
 
+    /// <summary>
+    /// Filtro de color.
+    /// </summary>
+    private int Color = -1;
+
 
     /// <summary>
     /// Constructor.
     /// </summary>
     public Home()
     {
-       
         Instance = this;
     }
 
 
+    /// <summary>
+    /// Evento al inicializar.
+    /// </summary>
     protected override void OnInitialized()
     {
         // Cargar datos.
@@ -54,26 +58,21 @@ public partial class Home : IDisposable
     }
 
 
-
-
     /// <summary>
     /// Obtener datos desde el servicio.
     /// </summary>
     private async void Load()
     {
-
         try
         {
             // Rellena los datos
             await RefreshData();
             _ = InvokeAsync(StateHasChanged);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
         }
-
     }
-
 
 
     /// <summary>
@@ -86,29 +85,16 @@ public partial class Home : IDisposable
         if (!force && Notes != null)
             return;
 
-        // Respuestas.
-        ReadAllResponse<NoteDataModel>? items = null;
-
-        var x = Session.Instance.Account;
-
+        // Estado cambio.
         _ = InvokeAsync(StateHasChanged);
 
-     
-
-            // Obtener desde la API.
-            items = await Access.Notes.Controllers.Notes.ReadAll(Access.Notes.Session.Instance.Token);
-
-            // Rellena los items
-            Notes = items;
-
-
+        // Respuestas.
+        Notes = await Access.Notes.Controllers.Notes.ReadAll(Session.Instance.Token);
 
         // Actualizar pantalla.
         _ = InvokeAsync(StateHasChanged);
         return;
-
     }
-
 
 
     /// <summary>
@@ -116,14 +102,13 @@ public partial class Home : IDisposable
     /// </summary>
     private async void CloseSession()
     {
-        await InvokeAsync(async () =>
+        await InvokeAsync(() =>
         {
             Access.Notes.Observers.SessionObserver.Dispose();
             Access.Auth.SessionAuth.CloseSession();
             NavigationManager?.NavigateTo("/");
         });
     }
-
 
 
     /// <summary>
@@ -148,16 +133,10 @@ public partial class Home : IDisposable
     }
 
 
-
     /// <summary>
     /// Ir a crear nueva nota.
     /// </summary>
     private void Create() => Go(new());
-
-
-
-    bool IsClean = false;
-
 
 
     /// <summary>
@@ -166,17 +145,12 @@ public partial class Home : IDisposable
     /// <param name="notas">Lista de notas.</param>
     public async void RemoveOne(int id)
     {
-        await this.InvokeAsync(async () =>
+        await InvokeAsync(() =>
          {
-
              Notes?.Models.RemoveAll(t => t.Id == id);
              StateHasChanged();
-             
-
          });
-
     }
-
 
 
     /// <summary>
@@ -184,49 +158,36 @@ public partial class Home : IDisposable
     /// </summary>
     public async void UpdateColor(int id, int color)
     {
-        await this.InvokeAsync(async () =>
+        await InvokeAsync(() =>
         {
-
+            // Color.
             foreach (var note in Notes?.Models.Where(t => t.Id == id) ?? [])
             {
                 note.Color = color;
             }
-
             StateHasChanged();
-
-
-
         });
-
     }
-
 
 
     /// <summary>
-    /// Iniciar sesión de servidor.
+    /// Establecer el color.
     /// </summary>
-    /// <param name="user">Usuario.</param>
-    /// <param name="password">Contraseña.</param>
-    private static async Task Start(string user, string password)
-    {
-
-        // Iniciar sesión.
-        var (_, _) = await Access.Notes.Session.LoginWith(user, password, true);
-
-    }
-
-
-
-
-    void SetColor(int color)
+    /// <param name="color">Color.</param>
+    private void SetColor(int color)
     {
         Color = color;
         InvokeAsync(StateHasChanged);
     }
 
+
+    /// <summary>
+    /// Dispose.
+    /// </summary>
     public void Dispose()
     {
         // Eliminar evento al actualizar la sesión.
         Access.Notes.Observers.SessionObserver.OnUpdate -= OnUpdateSession;
     }
+
 }

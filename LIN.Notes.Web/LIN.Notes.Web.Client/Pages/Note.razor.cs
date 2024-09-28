@@ -1,6 +1,4 @@
-﻿using LIN.Access.Notes;
-using LIN.Notes.Shared.Modals;
-using LIN.Types.Notes.Models;
+﻿using LIN.Notes.Shared.Modals;
 
 namespace LIN.Notes.Web.Client.Pages;
 
@@ -63,7 +61,7 @@ public partial class Note
     /// Volver a atrás.
     /// </summary>
     private async void Back() => await JSRuntime.InvokeVoidAsync("backLast");
-    
+
 
     /// <summary>
     /// Establecer el nuevo color.

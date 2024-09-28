@@ -1,6 +1,6 @@
 ﻿using LIN.Access.Auth.Hubs;
-using LIN.Types.Cloud.Identity.Models;
 using LIN.Types.Cloud.Identity.Enumerations;
+using LIN.Types.Cloud.Identity.Models;
 
 namespace LIN.Notes.Web.Client.Pages;
 
@@ -208,7 +208,7 @@ public partial class Login
                 // Obtener local db.
                 //LocalDataBase.Data.UserDB database = new();
 
-              
+
                 // Navegar.
                 NavigationManager?.NavigateTo("/home");
                 return;
@@ -396,7 +396,5 @@ public partial class Login
             ShowError(message);
         });
     }
-
-
 
 }

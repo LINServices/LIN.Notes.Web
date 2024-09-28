@@ -1,3 +1,5 @@
+global using LIN.Access.Notes;
+global using LIN.Types.Notes.Models;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.JSInterop;
 global using LIN.Types.Responses;
