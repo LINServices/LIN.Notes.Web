@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Access.Auth", "D:\LIN S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Types.Emma", "D:\LIN Services\Tipos\LIN.Types.Emma\LIN.Types.Emma.csproj", "{719D49EB-43E8-44C8-80FD-381F6DFAF63E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIN.Notes.Shared", "..\..\Components\LIN.Notes.Shared\LIN.Notes.Shared.csproj", "{B292F7EE-6226-4360-9BB3-23A1530F1108}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Notes.Shared", "..\..\Components\LIN.Notes.Shared\LIN.Notes.Shared.csproj", "{B292F7EE-6226-4360-9BB3-23A1530F1108}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

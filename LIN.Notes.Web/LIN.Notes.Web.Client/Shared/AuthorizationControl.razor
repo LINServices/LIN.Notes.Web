@@ -1,0 +1,18 @@
+﻿@inject NavigationManager navigationManager
+
+@if (!Access.Notes.Session.IsLocalOpen)
+{
+
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-white">
+        <div class="flex flex-col items-center justify-center rounded-lg">
+            <Loader />
+            <h2 class="mb-4 text-base font-bold">Redirigiendo</h2>
+        </div>
+    </div>
+
+    Task.Run(async () =>
+    {
+        navigationManager.NavigateTo("/");
+    });
+    return;
+}
