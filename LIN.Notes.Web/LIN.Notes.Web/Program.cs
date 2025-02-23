@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
-LIN.Access.Notes.Build.Init();
+LIN.Access.Notes.Build.AddNotesService(builder.Services);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

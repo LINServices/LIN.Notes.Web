@@ -193,7 +193,7 @@ public partial class Login
         }
 
         // Iniciar sesión.
-        var (Session, Response) = await Access.Notes.Session.LoginWith(User, Password, true);
+        var (_, Response) = await Access.Notes.SessionManager.Instance.StarSession(User, Password, true);
 
         // Validar respuesta.
         switch (Response)
@@ -338,7 +338,7 @@ public partial class Login
         UpdateSection(1);
 
         // Generar login.
-        var logIn = Access.Notes.Session.LoginWith(e.Token);
+        var logIn = LIN.Access.Notes.SessionManager.Instance.StarSession(e.Token);
 
         // Esperar 4 segundos.
         await Task.Delay(4000);

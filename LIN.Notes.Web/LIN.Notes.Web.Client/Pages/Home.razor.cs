@@ -1,4 +1,6 @@
-﻿namespace LIN.Notes.Web.Client.Pages;
+﻿using LIN.Access.Notes.Sessions;
+
+namespace LIN.Notes.Web.Client.Pages;
 
 public partial class Home : IDisposable
 {
@@ -89,7 +91,7 @@ public partial class Home : IDisposable
         _ = InvokeAsync(StateHasChanged);
 
         // Respuestas.
-        Notes = await Access.Notes.Controllers.Notes.ReadAll(Session.Instance.Token);
+        Notes = await Access.Notes.Controllers.Notes.ReadAll(SessionManager.Instance.Default.Token);
 
         // Actualizar pantalla.
         _ = InvokeAsync(StateHasChanged);

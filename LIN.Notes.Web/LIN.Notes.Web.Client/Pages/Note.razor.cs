@@ -167,10 +167,10 @@ public partial class Note
             Content = model.Content,
             Tittle = model.Tittle
         },
-        Session.Instance.Token);
+        SessionManager.Instance.Default.Token);
 
         // Respuesta.
-        return response.Response == Responses.Success ? response.LastID : 0;
+        return response.Response == Responses.Success ? response.LastId : 0;
 
 
     }
@@ -191,7 +191,7 @@ public partial class Note
 
 
         if (NoteDataModel.Id > 0)
-            response = await Access.Notes.Controllers.Notes.Update(NoteDataModel.Id, color, Session.Instance.Token);
+            response = await Access.Notes.Controllers.Notes.Update(NoteDataModel.Id, color, SessionManager.Instance.Default.Token);
 
 
 
@@ -215,7 +215,7 @@ public partial class Note
 
         // Respuesta de la API.
         if (NoteDataModel.Id > 0)
-            response = await Access.Notes.Controllers.Notes.Delete(NoteDataModel.Id, Session.Instance.Token);
+            response = await Access.Notes.Controllers.Notes.Delete(NoteDataModel.Id, SessionManager.Instance.Default.Token);
 
         Home.Notes?.Models.RemoveAll(t => t.Id == NoteDataModel.Id);
         NavigationManager.NavigateTo("Home");
@@ -248,7 +248,7 @@ public partial class Note
 
         // Respuesta de la API.
         if (NoteDataModel.Id > 0)
-            _ = await Access.Notes.Controllers.Notes.Update(NoteDataModel, Session.Instance.Token);
+            _ = await Access.Notes.Controllers.Notes.Update(NoteDataModel, SessionManager.Instance.Default.Token);
 
         // Crear local.
         else if (NoteDataModel.Id == 0)

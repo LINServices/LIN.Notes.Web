@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager navigationManager
 
-@if (!Access.Notes.Session.IsLocalOpen)
+@if (!Access.Notes.SessionManager.Instance.Default.IsLocalOpen)
 {
 
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-white">

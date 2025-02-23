@@ -11,6 +11,6 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddAuthenticationService();
 
-LIN.Access.Notes.Build.Init();
+builder.Services.AddNotesService();
 
 await builder.Build().RunAsync();
