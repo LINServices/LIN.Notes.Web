@@ -183,7 +183,7 @@ public partial class Login
             case Responses.Success:
 
                 // Iniciar servicios de tiempo real.
-                //Services.Realtime.Start();
+                Services.Realtime.Start();
 
                 // Obtener local db.
                 //LocalDataBase.Data.UserDB database = new();

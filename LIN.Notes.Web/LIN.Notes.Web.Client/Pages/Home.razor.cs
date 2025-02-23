@@ -183,6 +183,39 @@ public partial class Home : IDisposable
     }
 
 
+    public async void Update(int id, string content)
+    {
+        await this.InvokeAsync(async () =>
+        {
+
+            foreach (var note in Notes?.Models.Where(t => t.Id == id) ?? [])
+            {
+                note.Content = content;
+            }
+
+            StateHasChanged();
+
+            //// Base de datos local.
+            //var noteDB = new LocalDataBase.Data.NoteDB();
+
+            //var md = Notes?.Models.Where(t => t.Id == id).FirstOrDefault();
+
+            //await noteDB.Update(new()
+            //{
+
+            //    IsDeleted = false,
+            //    Color = md.Color,
+            //    Content = content,
+            //    Id = id,
+            //    IsConfirmed = true,
+            //    Tittle = md.Tittle
+            //});
+
+
+        });
+
+    }
+
     /// <summary>
     /// Dispose.
     /// </summary>

@@ -13,4 +13,6 @@ builder.Services.AddAuthenticationService();
 
 builder.Services.AddNotesService();
 
+LIN.Notes.Web.Client.Services.Realtime.Build();
+
 await builder.Build().RunAsync();
