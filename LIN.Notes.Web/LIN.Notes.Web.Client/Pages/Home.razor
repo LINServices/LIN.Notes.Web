@@ -1,6 +1,7 @@
 ﻿@page "/home"
 <PageTitle>Inicio</PageTitle>
 @inject NavigationManager NavigationManager
+@inject LIN.Access.Notes.Sessions.Abstractions.ISession Session
 
 <LIN.Notes.Web.Client.Shared.AuthorizationControl />
 
@@ -19,7 +20,7 @@
                 @* Perfil. *@
                <PopSession OnClick="CloseSession" />
                 
-                <label class="font-medium text-zinc-900 dark:text-zinc-300">@LIN.Access.Notes.SessionManager.Instance.Default.Account.Name</label>
+                <label class="font-medium text-zinc-900 dark:text-zinc-300">@Session.Account.Name</label>
             </div>
         </div>
 

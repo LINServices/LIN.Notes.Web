@@ -75,33 +75,13 @@ public partial class Login
     /// <summary>
     /// Id único de inicio passkey.
     /// </summary>
-    private string Unique = "";
+    private string Unique = string.Empty;
 
 
     /// <summary>
     /// Hub passkey.
     /// </summary>
     private PassKeyHub? hub = null;
-
-
-
-
-    /// <summary>
-    /// Evento.
-    /// </summary>
-    protected override async Task OnInitializedAsync()
-    {
-
-        // Validar sesión activa.
-        if (Access.Auth.SessionAuth.IsOpen)
-        {
-            NavigationManager?.NavigateTo("/home");
-            return;
-        }
-
-    }
-
-
 
     /// <summary>
     /// Actualizar la sección.
@@ -193,7 +173,7 @@ public partial class Login
         }
 
         // Iniciar sesión.
-        var (_, Response) = await Access.Notes.SessionManager.Instance.StarSession(User, Password, true);
+        var (_, Response) = await SessionManager.StarSession(User, Password, true);
 
         // Validar respuesta.
         switch (Response)
@@ -338,7 +318,7 @@ public partial class Login
         UpdateSection(1);
 
         // Generar login.
-        var logIn = LIN.Access.Notes.SessionManager.Instance.StarSession(e.Token);
+        var logIn = SessionManager.StarSession(e.Token);
 
         // Esperar 4 segundos.
         await Task.Delay(4000);

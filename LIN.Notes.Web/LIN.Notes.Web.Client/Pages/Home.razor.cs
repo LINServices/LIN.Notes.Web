@@ -91,7 +91,7 @@ public partial class Home : IDisposable
         _ = InvokeAsync(StateHasChanged);
 
         // Respuestas.
-        Notes = await Access.Notes.Controllers.Notes.ReadAll(SessionManager.Instance.Default.Token);
+        Notes = await Access.Notes.Controllers.Notes.ReadAll(Session.Token);
 
         // Actualizar pantalla.
         _ = InvokeAsync(StateHasChanged);
