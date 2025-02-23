@@ -195,8 +195,8 @@ public partial class Home : IDisposable
 
             StateHasChanged();
 
-            //// Base de datos local.
-            //var noteDB = new LocalDataBase.Data.NoteDB();
+            // Base de datos local.
+            //var noteDB = new .Data.NoteDB();
 
             //var md = Notes?.Models.Where(t => t.Id == id).FirstOrDefault();
 
@@ -212,6 +212,23 @@ public partial class Home : IDisposable
             //});
 
 
+        });
+
+    }
+
+
+    public async void Add(NoteDataModel model)
+    {
+        await this.InvokeAsync(async () =>
+        {
+
+            var exist = Notes.Models.Exists(t => t.Id == model.Id);
+
+            if (exist)
+                return;
+
+            Notes.Models.Add(model);
+            StateHasChanged();
         });
 
     }
