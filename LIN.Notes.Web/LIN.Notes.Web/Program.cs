@@ -1,6 +1,4 @@
-using LIN.Notes.Web.Client.Pages;
 using LIN.Notes.Web.Components;
-using LIN.Access.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 

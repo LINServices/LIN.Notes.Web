@@ -7,10 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Notes.Web", "LIN.Notes.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Notes.Web.Client", "LIN.Notes.Web\LIN.Notes.Web.Client\LIN.Notes.Web.Client.csproj", "{354BDE0D-059F-4F77-B03C-2E6EA06517B2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Access.Notes", "D:\LIN Services\AccesoAPI\LIN.Access.Notes\LIN.Access.Notes.csproj", "{117BF3BA-46C5-4E51-A44A-BBAF5CC90D6B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Access.Auth", "D:\LIN Services\AccesoAPI\LIN.Access.Auth\LIN.Access.Auth.csproj", "{12CDAB4B-7F5D-496C-9855-7AC6FFEE3FD4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LIN.Notes.Shared", "..\..\Components\LIN.Notes.Shared\LIN.Notes.Shared.csproj", "{B292F7EE-6226-4360-9BB3-23A1530F1108}"
 EndProject
 Global
@@ -27,14 +23,6 @@ Global
 		{354BDE0D-059F-4F77-B03C-2E6EA06517B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{354BDE0D-059F-4F77-B03C-2E6EA06517B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{354BDE0D-059F-4F77-B03C-2E6EA06517B2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{117BF3BA-46C5-4E51-A44A-BBAF5CC90D6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{117BF3BA-46C5-4E51-A44A-BBAF5CC90D6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{117BF3BA-46C5-4E51-A44A-BBAF5CC90D6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{117BF3BA-46C5-4E51-A44A-BBAF5CC90D6B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{12CDAB4B-7F5D-496C-9855-7AC6FFEE3FD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{12CDAB4B-7F5D-496C-9855-7AC6FFEE3FD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{12CDAB4B-7F5D-496C-9855-7AC6FFEE3FD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{12CDAB4B-7F5D-496C-9855-7AC6FFEE3FD4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B292F7EE-6226-4360-9BB3-23A1530F1108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B292F7EE-6226-4360-9BB3-23A1530F1108}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B292F7EE-6226-4360-9BB3-23A1530F1108}.Release|Any CPU.ActiveCfg = Release|Any CPU
