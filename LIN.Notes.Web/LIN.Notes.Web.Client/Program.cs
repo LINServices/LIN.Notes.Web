@@ -11,7 +11,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddAuthenticationService();
 
-builder.Services.AddNotesService();
+builder.Services.AddNotesService("https://api.linplatform.com/notes/");
 
 LIN.Notes.Web.Client.Services.Realtime.Build();
 

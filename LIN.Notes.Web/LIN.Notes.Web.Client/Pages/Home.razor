@@ -6,7 +6,7 @@
 <LIN.Notes.Web.Client.Shared.AuthorizationControl />
 
 @* Pantalla *@
-<div class="UIScroll fade-in flex w-full justify-center overflow-x-hidden overflow-y-auto">
+<div class="UIScroll fade-in flex w-full justify-center overflow-y-auto overflow-x-hidden">
     <div class="flex h-full w-full flex-grow flex-col px-4 pt-9 lg:px-10">
 
         @* Título *@
@@ -76,7 +76,6 @@
             }
             else
             {
-
                 @* Si hubo un error. *@
                 @if (Notes.Response != Responses.Success)
                 {
@@ -86,11 +85,20 @@
                 @* Renderizar notas. *@
                 else
                 {
-                    @* Control de notas. *@
-                    @foreach(var e in Notes.Models.Where(t=>t.Color == Color || Color == -1))
+                    if (Notes.Models.Where(t=>t.Color == Color || Color == -1).Count() == 0)
                     {
-                        <NoteControl Note="e" OnClick="Go" />
-                    } 
+                        <div class="col-span-full mt-3 flex w-full items-center justify-center rounded-lg border-2 border-dashed border-gray-300 py-10 dark:border-zinc-600">
+                            <label class="text-gray-400 dark:text-zinc-400">No tienes ninguna nota</label>
+                        </div>
+                    }
+                    else
+                    {
+                        @* Control de notas. *@
+                        @foreach (var e in Notes.Models.Where(t => t.Color == Color || Color == -1))
+                        {
+                            <NoteControl Note="e" OnClick="Go" />
+                        }
+                    }
                 }
             }
 
