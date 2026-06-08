@@ -22,6 +22,7 @@ else
 
 app.UseHttpsRedirection();
 
+app.MapStaticAssets();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
