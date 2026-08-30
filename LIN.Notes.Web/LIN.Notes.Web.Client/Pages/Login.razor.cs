@@ -84,7 +84,7 @@ public partial class Login : IDisposable
     {
         if (SessionAuth.IsOpen)
         {
-            NavigationManager?.NavigateTo("/");
+            NavigationManager?.NavigateTo("/home");
             return;
         }
         base.OnInitialized();
@@ -405,7 +405,7 @@ public partial class Login : IDisposable
         //    if (orgMe.Response == Responses.Success)
         //        OrganizationContext.SetOrganization(orgMe.Model);
 
-        NavigationManager?.NavigateTo("/");
+        NavigationManager?.NavigateTo("/home");
     }
 
     /// <summary>

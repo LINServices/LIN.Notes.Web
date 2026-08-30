@@ -1,6 +1,9 @@
+using LIN.Access.Notes;
 using LIN.Notes.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddNotesService("https://api.linplatform.com/notes/");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
