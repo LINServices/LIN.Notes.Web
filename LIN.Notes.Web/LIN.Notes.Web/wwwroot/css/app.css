@@ -1,0 +1,156 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    /* Los tokens se guardan como CANALES RGB sueltos ("R G B"), no como hex.
+       Es la única forma de que Tailwind v3 pueda inyectar alfa: el config los
+       consume como rgb(var(--token) / <alpha-value>), y así funcionan tanto
+       `bg-current-800` como `bg-current-800/40`. Si guardas un hex aquí, el
+       modificador de opacidad se descarta en silencio.
+       Para usar un token en CSS suelto hay que envolverlo: rgb(var(--gim-ink)). */
+    /* Neutros */
+    --gim-canvas: 230 230 230; /* #E6E6E6 */
+    --gim-shell: 247 247 247; /* #F7F7F7 */
+    --gim-surface: 255 255 255; /* #FFFFFF */
+    --gim-surface-alt: 250 250 250; /* #FAFAFA */
+    --gim-ink: 10 10 10; /* #0A0A0A */
+    --gim-ink-2: 92 92 92; /* #5C5C5C */
+    --gim-muted: 154 154 154; /* #9A9A9A */
+    --gim-line: 236 236 236; /* #ECECEC */
+    --gim-line-strong: 221 221 221; /* #DDDDDD */
+    --gim-track: 239 239 239; /* #EFEFEF */
+    --gim-ghost: 214 214 214; /* #D6D6D6 */
+    /* Semánticos (§2.3). Los pasos 50/100/700 salen de mezclar el 500 en oklab
+       —8%, 16% sobre blanco y 82% sobre negro, según §13.1— pero se escriben
+       resueltos porque color-mix() devuelve un color, no canales. Si cambias un
+       500, recalcula sus tres derivados. */
+    --gim-danger-50: 255 241 240;
+    --gim-danger-100: 255 228 226;
+    --gim-danger-500: 229 72 77; /* #E5484D */
+    --gim-danger-700: 176 53 57;
+    --gim-warn-50: 255 248 240;
+    --gim-warn-100: 255 241 225;
+    --gim-warn-500: 245 165 36; /* #F5A524 */
+    --gim-warn-700: 188 126 25;
+
+    --gim-yell: 247 212 76; /* #F7D44C */
+    --gim-salmon: 235 122 83; /* #EB7A53 */
+    --gim-glass: 152 183 219; /* #98B7DB */
+    --gim-cream-green: 168 214 114; /* #A8D672 */
+    --gim-cream-purple: 142 122 181; /* #8E7AB5 */
+
+    /* Rampa "current" explícita (§13.2) — valores de marca del proyecto, no cambiar.
+       La alternativa por color-mix de §13.1 no es viable aquí: devolvería colores
+       en vez de canales y rompería los modificadores de opacidad que usa Login. */
+    --gim-current: 234 179 8; /* #eab308 */
+    --gim-current-50: 254 249 232; /* #fef9e8 */
+    --gim-current-100: 254 240 195; /* #fef0c3 */
+    --gim-current-200: 254 226 138; /* #fee28a */
+    --gim-current-300: 253 209 71; /* #fdd147 */
+    --gim-current-400: 250 194 21; /* #fac215 */
+    --gim-current-500: 234 179 8; /* #eab308 */
+    --gim-current-600: 202 154 4; /* #ca9a04 */
+    --gim-current-700: 161 124 7; /* #a17c07 */
+    --gim-current-800: 133 104 14; /* #85680e */
+    --gim-current-900: 113 90 18; /* #715a12 */
+    --gim-current-950: 66 51 6; /* #423306 */
+}
+
+/* Modo oscuro (§2.4): solo se redefine el eje neutro. La escala "current" no cambia. */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --gim-canvas: 17 17 17; /* #111111 */
+        --gim-shell: 22 22 22; /* #161616 */
+        --gim-surface: 28 28 28; /* #1C1C1C */
+        --gim-surface-alt: 33 33 33; /* #212121 */
+        --gim-ink: 250 250 250; /* #FAFAFA */
+        --gim-ink-2: 163 163 163; /* #A3A3A3 */
+        --gim-muted: 110 110 110; /* #6E6E6E */
+        --gim-line: 42 42 42; /* #2A2A2A */
+        --gim-line-strong: 58 58 58; /* #3A3A3A */
+        --gim-track: 38 38 38; /* #262626 */
+        --gim-ghost: 58 58 58; /* #3A3A3A */
+    }
+}
+
+@layer base {
+    body {
+        font-family: theme(fontFamily.sans);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.001ms !important;
+            animation-iteration-count: 1 !important;
+            transition-property: opacity !important;
+            transition-duration: 0.001ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
+@layer utilities {
+    .bg-ghost-ticks {
+        background-image: repeating-linear-gradient(to right, rgb(var(--gim-ghost)) 0 1px, transparent 1px 3px);
+    }
+
+    .tabular-nums {
+        font-variant-numeric: tabular-nums lining-nums;
+    }
+
+    /* Indicador de carga indeterminado (§10): ticks fantasma desplazándose,
+       en lugar de un shimmer gris genérico. */
+    .ghost-loading {
+        background-image: repeating-linear-gradient(to right, rgb(var(--gim-ghost)) 0 1px, transparent 1px 3px);
+        background-size: 24px 100%;
+        animation: ghost-loading-scroll 1.2s linear infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .ghost-loading {
+            animation: none;
+        }
+    }
+}
+
+@keyframes ghost-loading-scroll {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 24px 0;
+    }
+}
+
+.input {
+    @apply appearance-none border border-line bg-surface focus:border-line-strong focus:bg-surface focus:outline-none focus:ring-1 focus:ring-current-500;
+}
+
+.textbox {
+    @apply input text-body block w-full rounded-xl p-2.5 text-ink;
+}
+
+/* Estado válido de Blazor: el acento marca "lo logrado" (§1 regla 2). */
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid rgb(var(--gim-current-500));
+}
+
+.invalid {
+    outline: 1px solid rgb(var(--gim-danger-500));
+}
+
+.validation-message {
+    color: rgb(var(--gim-danger-500));
+}
+
+.blazor-error-boundary {
+    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: white;
+}
+
+    .blazor-error-boundary::after {
+        content: "An error has occurred."
+    }

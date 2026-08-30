@@ -9,8 +9,8 @@
   ],
   "BuildFiles": [
     {
-      "Input": "wwwroot\\css\\tailwind.css",
-      "Output": "wwwroot\\css\\tailwind.build.css"
+      "Input": "wwwroot\\css\\app.css",
+      "Output": "wwwroot\\css\\Tailwind.css"
     }
   ],
   "PackageConfigurationFile": null,

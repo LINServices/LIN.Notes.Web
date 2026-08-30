@@ -1,380 +1,464 @@
-﻿using LIN.Access.Auth.Hubs;
-using LIN.Types.Cloud.Identity.Enumerations;
-using LIN.Types.Cloud.Identity.Models;
+using LIN.Access.Identity.Platform;
+using LIN.Access.Identity.Platform.Controllers.Identities;
+using LIN.Access.Identity.Platform.Hubs;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace LIN.Notes.Web.Client.Pages;
 
-public partial class Login
+public partial class Login : IDisposable
 {
-
     /// <summary>
-    /// Navegación.
+    /// Gestor de navegación.
     /// </summary>
     [Inject]
     private NavigationManager? NavigationManager { get; set; }
 
+    [Inject]
+    private IConfiguration Configuration { get; set; } = null!;
 
     /// <summary>
-    /// Obtiene si se esta log con una llave de acceso
+    /// Indica si se está iniciando sesión con una llave de acceso (PassKey).
     /// </summary>
-    private bool IsWithKey { get; set; } = false;
-
+    private bool _isWithKey = false;
 
     /// <summary>
-    /// Usuario
+    /// Nombre de usuario ingresado.
     /// </summary>
-    private string User { get; set; } = "";
-
+    private string _username = string.Empty;
 
     /// <summary>
-    /// Contraseña
+    /// Contraseña ingresada.
     /// </summary>
-    private string Password { get; set; } = "";
-
+    private string _password = string.Empty;
 
     /// <summary>
-    /// Mensaje que se muestra al cargar
+    /// Mensaje mostrado durante procesos de carga.
     /// </summary>
-    private string LogMessage { get; set; } = "Iniciando Sesión";
-
+    private string _loadingMessage = "Iniciando Sesión";
 
     /// <summary>
-    /// Mensaje de error
+    /// Mensaje de error a mostrar en la UI.
     /// </summary>
-    private string ErrorMessage { get; set; } = "";
-
+    private string _errorMessage = string.Empty;
 
     /// <summary>
-    /// Visibilidad del error.
+    /// Indica si hay un proceso de inicio de sesión activo.
     /// </summary>
-    private bool ErrorVisible { get; set; } = false;
-
-
+    private bool _isLoggingIn = false;
 
     /// <summary>
-    /// Mostrar el botón de cancelar.
+    /// Indica si se debe mostrar una animación.
     /// </summary>
-    private bool ShowButtonCancel { get; set; } = false;
-
-
+    private bool _isAnimating = false;
 
     /// <summary>
-    /// Sección actual.
+    /// Visibilidad del mensaje de error.
     /// </summary>
-    private int Section { get; set; } = 0;
-
-
+    private string _errorVisibility = "hidden";
 
     /// <summary>
-    /// La respuesta de hub ya fue recibida.
+    /// Organizaciones candidatas cuando el login es ambiguo (la identidad pertenece a 2+ organizaciones).
     /// </summary>
-    private bool isResponseReceive = false;
-
-
+    private List<OrgAlternative> _orgAlternatives = [];
 
     /// <summary>
-    /// Id único de inicio passkey.
+    /// Indica si se debe mostrar el botón para cancelar una espera de aprobación de PassKey.
     /// </summary>
-    private string Unique = string.Empty;
-
-
-    /// <summary>
-    /// Hub passkey.
-    /// </summary>
-    private PassKeyHub? hub = null;
+    private bool _isCancelVisible = false;
 
     /// <summary>
-    /// Actualizar la sección.
+    /// Conexión activa al hub de PassKey mientras se espera la aprobación desde otro dispositivo.
     /// </summary>
-    /// <param name="section">Id de la sección</param>
-    private void UpdateSection(int section)
+    private PassKeyHub? _passKeyHub;
+
+    /// <summary>
+    /// Key del intent de PassKey en curso, devuelto por <see cref="PassKeys.CreateIntent"/>.
+    /// </summary>
+    private string? _passKeyIntentKey;
+
+    /// <summary>
+    /// Inicialización del componente.
+    /// </summary>
+    protected override void OnInitialized()
     {
-        InvokeAsync(() =>
+        if (SessionAuth.IsOpen)
         {
-            Section = section;
-            StateHasChanged();
-        });
+            NavigationManager?.NavigateTo("/");
+            return;
+        }
+        base.OnInitialized();
     }
 
-
-
     /// <summary>
-    /// Oculta los errores
+    /// Hace visibles los controles de entrada.
     /// </summary>
-    void HideError()
+    private void ShowControls()
     {
-        ErrorVisible = false;
+        _isLoggingIn = false;
         StateHasChanged();
     }
 
-
-
     /// <summary>
-    /// Oculta los errores
+    /// Oculta los controles de entrada.
     /// </summary>
-    void GoToForget()
+    private void HideControls()
     {
-        NavigationManager?.NavigateTo("/login/forgetPassword");
-    }
-
-
-
-    /// <summary>
-    /// Muestra un mensaje
-    /// </summary>
-    void ShowError(string message)
-    {
-        InvokeAsync(() =>
-        {
-            UpdateSection(0);
-            ErrorVisible = true;
-            ErrorMessage = message;
-            StateHasChanged();
-        });
-    }
-
-
-
-    /// <summary>
-    /// Muestra un mensaje
-    /// </summary>
-    void GotoLoginKey()
-    {
-        IsWithKey = !IsWithKey;
+        _isLoggingIn = true;
         StateHasChanged();
     }
 
-
+    /// <summary>
+    /// Alterna entre el modo de inicio de sesión normal y PassKey.
+    /// </summary>
+    private void TogglePassKeyMode()
+    {
+        _isWithKey = !_isWithKey;
+        HideError();
+        StateHasChanged();
+    }
 
     /// <summary>
-    /// Inicia sesión.
+    /// Oculta el mensaje de error.
     /// </summary>
-    private async void Start()
+    private void HideError()
     {
+        _errorVisibility = "hidden";
+        StateHasChanged();
+    }
 
-        // Validar si es con llave.
-        if (IsWithKey)
+    /// <summary>
+    /// Muestra un mensaje de error en la UI.
+    /// </summary>
+    /// <param name="message">Mensaje a mostrar.</param>
+    private void ShowError(string message)
+    {
+        _errorVisibility = "visible";
+        _errorMessage = message;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Inicia el proceso de autenticación.
+    /// </summary>
+    private async void StartAuthentication()
+    {
+        if (_isWithKey)
         {
-            StartKey();
+            await StartPassKeyLogin();
             return;
         }
 
-        // Estado cargando.
-        UpdateSection(3);
-
-        // Ocultar el error.
+        _loadingMessage = "Iniciando Sesión";
+        HideControls();
         HideError();
 
-        // Validar parámetros.
-        if (User.Length <= 0 || Password.Length <= 0)
+        // Validar información de entrada.
+        if (string.IsNullOrWhiteSpace(_username) || string.IsNullOrWhiteSpace(_password))
         {
+            ShowControls();
             ShowError("Completa todos los campos");
             return;
         }
 
-        // Iniciar sesión.
-        var (_, Response) = await SessionManager.StarSession(User, Password, true);
-
-        // Validar respuesta.
-        switch (Response)
-        {
-
-            // Correcto.
-            case Responses.Success:
-
-                // Iniciar servicios de tiempo real.
-                Services.Realtime.Start();
-
-                // Obtener local db.
-                //LocalDataBase.Data.UserDB database = new();
-
-
-                // Navegar.
-                NavigationManager?.NavigateTo("/home");
-                return;
-
-            // Contraseña incorrecta.
-            case Responses.InvalidPassword:
-                ShowError("La contraseña es incorrecta");
-                break;
-
-            // No existe la cuenta.
-            case Responses.NotExistAccount:
-                ShowError($"No se encontró el usuario '{User}'");
-                break;
-
-            // Desautorizado por la organización.
-            case Responses.UnauthorizedByOrg:
-                ShowError($"Tu organización no permite que accedas a esta app");
-                break;
-
-            default:
-                ShowError("Inténtalo mas tarde");
-                break;
-
-
-        }
-
+        await AttemptLogin(null);
     }
 
-
-
     /// <summary>
-    /// Inicia sesión
+    /// Inicia el proceso de autenticación mediante PassKey: crea el intent de login y espera,
+    /// por el hub en tiempo real, la aprobación desde un dispositivo ya autenticado.
     /// </summary>
-    async void StartKey()
+    private async Task StartPassKeyLogin()
     {
-        // Id único.
-        string localUnique = Guid.NewGuid().ToString();
-        Unique = localUnique;
-
-        // Mostrar mensaje.
-        ShowButtonCancel = false;
-        isResponseReceive = false;
-        LogMessage = "Revisa tu dispositivo";
-        UpdateSection(3);
         HideError();
 
-        // Validar parámetros.
-        if (User.Length <= 0)
+        if (string.IsNullOrWhiteSpace(_username))
         {
-            ShowError("Completa el campo de usuario");
+            ShowError("Usuario requerido");
             return;
         }
 
-        // Crear el hub.
-        hub = new(User, string.Empty, string.Empty);
+        var appKey = Configuration["lin:key"];
 
-        // Esperar la creación.
-        await hub.Suscribe();
-
-        // Crear evento.
-        hub.OnReceiveResponse += OnReceiveResponse;
-
-        // Intento.
-        PassKeyModel intent = new()
+        if (!Guid.TryParse(appKey, out var applicationKey))
         {
-            User = User
-        };
-
-        // Enviar el evento.
-        hub.SendIntent(intent);
-
-        // Mostrar el botón de cancelar.
-        await Task.Delay(3000);
-        ShowButtonCancel = true;
-        StateHasChanged();
-
-        // Tiempo de expiración.
-        await Task.Delay(30000);
-
-        if (isResponseReceive || localUnique != Unique)
+            ShowError("Inténtalo más tarde");
             return;
+        }
 
-        // Desconectar el hub.
-        hub?.Disconnect();
-        hub = null;
-        Show("La sesión de passkey ha expirado");
-        StateHasChanged();
+        _loadingMessage = "Esperando aprobación desde tu otro dispositivo...";
+        _isCancelVisible = true;
+        HideControls();
 
+        var intent = await PassKeys.CreateIntent(_username, applicationKey);
+
+        if (intent.Response != Responses.Success)
+        {
+            _isCancelVisible = false;
+            ShowControls();
+
+            if (intent.Response == Responses.InvalidUser)
+                ShowError($"No existe el usuario {_username}");
+            else if (intent.Response == Responses.UnauthorizedByApp)
+                ShowError("Esta aplicación no está autorizada");
+            else
+                ShowError("Inténtalo más tarde");
+
+            return;
+        }
+
+        _passKeyIntentKey = intent.Model.Key;
+
+        _passKeyHub = new PassKeyHub();
+        _passKeyHub.OnApprovalResult += OnPassKeyApprovalResult;
+        _passKeyHub.OnError += OnPassKeyError;
+
+        try
+        {
+            await _passKeyHub.ConnectAsync();
+            await _passKeyHub.WaitApprovalAsync(_passKeyIntentKey);
+        }
+        catch
+        {
+            await DisconnectPassKeyHub();
+            _isCancelVisible = false;
+            ShowControls();
+            ShowError("Inténtalo más tarde");
+        }
     }
 
-
-
     /// <summary>
-    /// Evento al recibir la respuesta de passkey.
+    /// Se ejecuta cuando el hub reporta el resultado de la aprobación del intent de PassKey.
     /// </summary>
-    private async void OnReceiveResponse(object? sender, PassKeyModel e)
+    private async void OnPassKeyApprovalResult(object? sender, PassKeyApprovalResult e)
     {
+        if (e.Key != _passKeyIntentKey)
+            return;
 
-        // Nuevo estado.
-        isResponseReceive = true;
+        await DisconnectPassKeyHub();
 
-        // Segun el estado.
+        if (e.Status == "Success")
+        {
+            var login = await SessionAuth.LoginWith(e.Token);
+
+            if (login.Response == Responses.Success)
+            {
+                await CompleteLogin();
+                return;
+            }
+
+            _isCancelVisible = false;
+            ShowControls();
+            ShowError("Inténtalo más tarde");
+            return;
+        }
+
+        _isCancelVisible = false;
+        ShowControls();
+
         switch (e.Status)
         {
-            case PassKeyStatus.Success:
+            case "Rejected":
+                ShowError("La solicitud fue rechazada desde tu otro dispositivo");
                 break;
-
-            case PassKeyStatus.Rejected:
-                Show("El intento Passkey fue rechazada");
-                return;
-
-            case PassKeyStatus.Expired:
-                Show("La sesión expiro");
-                return;
-
-            case PassKeyStatus.BlockedByOrg:
-                Show("Tu organización no permite que inicies en esta aplicación.");
-                return;
-
+            case "Expired":
+                ShowError("La solicitud expiró, inténtalo de nuevo");
+                break;
+            case "BlockedByOrg":
+                ShowError("Tu organización no permite este inicio de sesión");
+                break;
             default:
-                Show("Hubo un error al iniciar sesión con passkey");
-                return;
-        }
-
-
-        // Estado de animación.
-        UpdateSection(1);
-
-        // Generar login.
-        var logIn = SessionManager.StarSession(e.Token);
-
-        // Esperar 4 segundos.
-        await Task.Delay(4000);
-
-        // Esperar la respuesta de login.
-        var (_, response) = await logIn;
-
-        // Segun la respuesta.
-        switch (response)
-        {
-
-            // Correcto.
-            case Responses.Success:
-                NavigationManager?.NavigateTo("/home");
-                return;
-
-            // Otros.
-            default:
-                Show("Hubo un error al iniciar sesión");
+                ShowError(e.Message ?? "Inténtalo más tarde");
                 break;
         }
-
     }
 
-
-
     /// <summary>
-    /// Cancelar passkey.
+    /// Se ejecuta cuando el hub reporta un error de negocio (no una excepción de conexión).
     /// </summary>
-    void CancelPasskey()
+    private void OnPassKeyError(object? sender, string message)
     {
-        hub?.Disconnect();
-        hub = null;
-        UpdateSection(0);
-        return;
+        _ = DisconnectPassKeyHub();
+        _isCancelVisible = false;
+        ShowControls();
+        ShowError(message);
     }
 
-
+    /// <summary>
+    /// Cancela la espera de aprobación de PassKey en curso.
+    /// </summary>
+    private async void CancelPassKey()
+    {
+        await DisconnectPassKeyHub();
+        _isCancelVisible = false;
+        ShowControls();
+    }
 
     /// <summary>
-    /// Mostrar error.
+    /// Desconecta y limpia la conexión activa al hub de PassKey, si existe.
     /// </summary>
-    /// <param name="message">Mensaje de error.</param>
-    void Show(string message)
+    private async Task DisconnectPassKeyHub()
     {
-        InvokeAsync(async () =>
+        if (_passKeyHub is null)
+            return;
+
+        _passKeyHub.OnApprovalResult -= OnPassKeyApprovalResult;
+        _passKeyHub.OnError -= OnPassKeyError;
+
+        try
         {
-            // Estado fallido.
-            ErrorMessage = message;
-            UpdateSection(2);
+            await _passKeyHub.DisconnectAsync();
+        }
+        catch
+        {
+        }
 
-            // Esperar 2 segundos.
-            await Task.Delay(2000);
-
-            ShowError(message);
-        });
+        _passKeyHub = null;
+        _passKeyIntentKey = null;
     }
 
+    /// <summary>
+    /// Libera la conexión al hub de PassKey si el componente se destruye mientras hay una espera activa.
+    /// </summary>
+    public void Dispose()
+    {
+        if (_passKeyHub is not null)
+        {
+            _passKeyHub.OnApprovalResult -= OnPassKeyApprovalResult;
+            _passKeyHub.OnError -= OnPassKeyError;
+            _ = _passKeyHub.DisconnectAsync();
+        }
+    }
+
+    /// <summary>
+    /// Intenta iniciar sesión, opcionalmente para una organización específica (caso de login ambiguo).
+    /// </summary>
+    /// <param name="organizationId">Id de la organización elegida, si aplica.</param>
+    private async Task AttemptLogin(int? organizationId)
+    {
+        var (login, response) = await SessionManager.Instance.StarSession(_username, _password, true);
+
+        if (response == Responses.Success)
+        {
+            await CompleteLogin();
+            return;
+        }
+
+        // LoginWith no expone las Alternatives cuando falla (devuelve Sesion null); se reconsulta
+        // directamente contra Authentication.Login para poder leerlas y armar el selector.
+        if (response == Responses.InvalidParam)
+        {
+            var appKey = Configuration["lin:key"];
+
+            if (Guid.TryParse(appKey, out var applicationKey))
+            {
+                var raw = await Authentication.Login(_username, _password, applicationKey, organizationId);
+
+                if (raw.Response == Responses.InvalidParam && raw.Alternatives.Count > 0)
+                {
+                    _orgAlternatives = ParseAlternatives(raw.Alternatives);
+
+                    if (_orgAlternatives.Count > 0)
+                    {
+                        ShowControls();
+                        StateHasChanged();
+                        return;
+                    }
+                }
+            }
+
+            ShowControls();
+            ShowError("No fue posible determinar tu organización");
+            return;
+        }
+        else if (response == Responses.InvalidPassword)
+        {
+            ShowControls();
+            ShowError("La contraseña es incorrecta");
+        }
+        else if (response == Responses.NotExistAccount)
+        {
+            ShowControls();
+            ShowError($"No existe el usuario {_username}");
+        }
+        else if (response == Responses.UnauthorizedByOrg)
+        {
+            ShowControls();
+            ShowError("Tu organización no permite que accedas a esta app");
+        }
+        else
+        {
+            ShowControls();
+            ShowError("Inténtalo más tarde");
+        }
+    }
+
+    /// <summary>
+    /// Finaliza un login exitoso (con contraseña o PassKey): fija el contexto de organización y navega al home.
+    /// </summary>
+    private async Task CompleteLogin()
+    {
+        //    _orgAlternatives = [];
+        //    OrganizationContext.SetOrganization(SessionAuth.Instance.Account.Identity.OwnerOrganizationId);
+
+        //    var orgMe = await Organizations.ReadMe(SessionAuth.Instance.AccountToken);
+        //    if (orgMe.Response == Responses.Success)
+        //        OrganizationContext.SetOrganization(orgMe.Model);
+
+        NavigationManager?.NavigateTo("/");
+    }
+
+    /// <summary>
+    /// Reintenta el login con la organización seleccionada por el usuario.
+    /// </summary>
+    /// <param name="alternative">Organización elegida.</param>
+    private async void SelectOrganization(OrgAlternative alternative)
+    {
+        HideControls();
+        await AttemptLogin(alternative.Id);
+    }
+
+    /// <summary>
+    /// Deserializa la lista de alternativas (cada elemento es un string JSON anidado con { Id, Name }).
+    /// </summary>
+    private static List<OrgAlternative> ParseAlternatives(List<object> alternatives)
+    {
+        var result = new List<OrgAlternative>();
+
+        foreach (var item in alternatives)
+        {
+            try
+            {
+                var json = item?.ToString();
+                if (string.IsNullOrWhiteSpace(json))
+                    continue;
+
+                var alternative = JsonSerializer.Deserialize<OrgAlternative>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (alternative is not null)
+                    result.Add(alternative);
+            }
+            catch (JsonException)
+            {
+                // Elemento no deserializable, se omite.
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Organización candidata en un login ambiguo.
+    /// </summary>
+    public sealed class OrgAlternative
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = string.Empty;
+    }
 }

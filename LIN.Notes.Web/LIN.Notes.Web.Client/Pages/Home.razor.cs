@@ -107,7 +107,7 @@ public partial class Home : IDisposable
         await InvokeAsync(() =>
         {
             Access.Notes.Observers.SessionObserver.Dispose();
-            Access.Auth.SessionAuth.CloseSession();
+            Access.Identity.Platform.SessionAuth.CloseSession();
             NavigationManager?.NavigateTo("/");
         });
     }
