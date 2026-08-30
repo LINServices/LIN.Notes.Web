@@ -7,9 +7,9 @@
 <LIN.Notes.Web.Client.Shared.AuthorizationControl />
 
 @* Pantalla *@
-<div class="UIScroll @GetClass() flex h-screen w-full justify-center transition-colors duration-200 ease-in-out">
+<div class="UIScroll @GetClass() flex min-h-screen w-full justify-center transition-colors duration-200 ease-in-out">
 
-    <div class="fade-in-fwd flex h-full w-full flex-grow flex-col px-4 pt-9 lg:px-10">
+    <div class="fade-in-fwd flex w-full flex-col px-4 pt-9 lg:px-10">
 
         @* Botón de atrás *@
         <div class="mb-3 flex w-full gap-2">
@@ -42,7 +42,52 @@
         </div>
 
         @* Contenido *@
-        <textarea @oninput="Input" @bind="Content" id="comment" rows="4" class="UIScroll border-0 mt-3 h-full w-full resize-none bg-transparent px-0 text-base text-gray-900 placeholder-zinc-800 outline-none focus:ring-0 dark:text-white dark:placeholder-gray-400 @(NoteDataModel?.Color == 1 ? "selection:bg-salmon dark:selection:bg-salmon/50" : NoteDataModel?.Color == 2 ? "selection:bg-glass dark:selection:bg-glass/50" : NoteDataModel?.Color == 3 ? "selection:bg-cream-green dark:selection:bg-cream-green/20" : NoteDataModel?.Color == 4 ? "selection:bg-cream-purple dark:selection:bg-cream-purple/50":"selection:bg-yell dark:selection:bg-yell/50" )" placeholder="Escribir tu nota..." required />
+        <textarea @oninput="Input" @bind="Content" id="comment" rows="4" class="UIScroll border-0 mt-3 min-h-[40vh] w-full resize-none bg-transparent px-0 text-base text-gray-900 placeholder-zinc-800 outline-none focus:ring-0 dark:text-white dark:placeholder-gray-400 @(NoteDataModel?.Color == 1 ? "selection:bg-salmon dark:selection:bg-salmon/50" : NoteDataModel?.Color == 2 ? "selection:bg-glass dark:selection:bg-glass/50" : NoteDataModel?.Color == 3 ? "selection:bg-cream-green dark:selection:bg-cream-green/20" : NoteDataModel?.Color == 4 ? "selection:bg-cream-purple dark:selection:bg-cream-purple/50":"selection:bg-yell dark:selection:bg-yell/50" )" placeholder="Escribir tu nota..." required />
+
+        @* Tareas *@
+        @if (NoteDataModel != null)
+        {
+            <div class="mt-4 pb-8">
+
+                @if (NoteDataModel.Tasks.Any())
+                {
+                    <div class="mb-2 flex flex-col gap-1">
+                        @foreach (var task in NoteDataModel.Tasks)
+                        {
+                            <div class="group flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-black/5 dark:hover:bg-white/5">
+                                <button @onclick="()=>ToggleTask(task)" class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-colors @(task.IsCompleted ? "bg-zinc-700 border-zinc-700 dark:bg-zinc-300 dark:border-zinc-300" : "border-zinc-500 dark:border-zinc-400")">
+                                    @if (task.IsCompleted)
+                                    {
+                                        <svg class="h-3 w-3 text-white dark:text-zinc-900" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                        </svg>
+                                    }
+                                </button>
+                                <span class="flex-1 text-sm text-zinc-800 dark:text-zinc-200 @(task.IsCompleted ? "line-through opacity-50" : "")">@task.Description</span>
+                                <button @onclick="()=>DeleteTask(task)" class="invisible flex h-6 w-6 items-center justify-center rounded-full text-zinc-500 hover:bg-black/10 group-hover:visible dark:text-zinc-400 dark:hover:bg-white/10">
+                                    <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 448 512">
+                                        <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @* Input nueva tarea *@
+                <div class="flex items-center gap-2 rounded-lg px-2 py-1.5">
+                    <div class="flex h-5 w-5 flex-shrink-0 items-center justify-center text-zinc-400">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                    </div>
+                    <input @bind="NewTaskDescription" @bind:event="oninput" @onkeydown="OnTaskKeyDown"
+                           class="flex-1 bg-transparent text-sm text-zinc-800 placeholder-zinc-500 outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
+                           placeholder="Agregar tarea..." />
+                </div>
+
+            </div>
+        }
 
     </div>
 

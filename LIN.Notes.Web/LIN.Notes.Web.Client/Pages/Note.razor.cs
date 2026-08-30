@@ -38,6 +38,12 @@ public partial class Note
 
 
     /// <summary>
+    /// Descripción de la nueva tarea.
+    /// </summary>
+    private string NewTaskDescription { get; set; } = string.Empty;
+
+
+    /// <summary>
     /// Evento al establecer los parámetros.
     /// </summary>
     protected override void OnParametersSet()
@@ -223,6 +229,64 @@ public partial class Note
 
     }
 
+
+
+    private async Task OnTaskKeyDown(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(NewTaskDescription))
+            await AddTask();
+    }
+
+
+    private async Task AddTask()
+    {
+        if (NoteDataModel == null || string.IsNullOrWhiteSpace(NewTaskDescription))
+            return;
+
+        // Guardar la nota primero si aún no tiene Id.
+        if (NoteDataModel.Id <= 0)
+            await Save();
+
+        if (NoteDataModel.Id <= 0)
+            return;
+
+        var task = new TaskDataModel
+        {
+            Description = NewTaskDescription.Trim(),
+            NoteId = NoteDataModel.Id,
+            IsCompleted = false
+        };
+
+        var response = await Access.Notes.Controllers.Tasks.Create(task, SessionManager.Instance.Default.Token);
+
+        if (response.Response == Responses.Success)
+        {
+            task.Id = response.LastId;
+            NoteDataModel.Tasks.Add(task);
+            NewTaskDescription = string.Empty;
+            StateHasChanged();
+        }
+    }
+
+
+    private async Task ToggleTask(TaskDataModel task)
+    {
+        task.IsCompleted = !task.IsCompleted;
+        StateHasChanged();
+
+        if (task.Id > 0)
+            await Access.Notes.Controllers.Tasks.Update(task, SessionManager.Instance.Default.Token);
+    }
+
+
+    private async Task DeleteTask(TaskDataModel task)
+    {
+        NoteDataModel?.Tasks.Remove(task);
+        StateHasChanged();
+
+        if (task.Id > 0)
+            await Access.Notes.Controllers.Tasks.Delete(task.Id, SessionManager.Instance.Default.Token);
+    }
 
 
     bool IsSaving = false;
